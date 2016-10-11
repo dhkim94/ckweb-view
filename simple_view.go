@@ -77,8 +77,6 @@ func upsertHtmlText(filePath string) (out *string, oerr error) {
 func RenderSimple(w http.ResponseWriter, r *http.Request, fname string, data interface{}, isComplete chan bool) {
 	content, err := upsertHtmlText(fname)
 
-	// todo header 설정 해 줘야 한다.
-
 	if err != nil {
 
 		// todo error 출력에 따른 헤더 설정 필요하면 여기서 추가 한다.
@@ -109,3 +107,35 @@ func RenderSimple(w http.ResponseWriter, r *http.Request, fname string, data int
 
 	isComplete <- true
 }
+
+// show simple html template
+// data : nullable value
+func RenderSimple2(w http.ResponseWriter, r *http.Request, fname string, data interface{}) {
+	content, err := upsertHtmlText(fname)
+
+	if err != nil {
+
+		// todo error 출력에 따른 헤더 설정 필요하면 여기서 추가 한다.
+
+		w.Write([]byte("not found file: " + fname))
+		return
+	}
+
+	tmpl, err2 := template.New(fname).Parse(*content)
+	if err2 != nil {
+
+		// todo error 출력에 따른 헤더 설정 필요하면 여기서 추가 한다.
+
+		w.Write([]byte("template error. file: " + fname))
+		return
+	}
+
+	//t1.Execute(w, nil)
+	if err := tmpl.Execute(w, data); err != nil {
+		// todo error 출력에 따른 헤더 설정 필요하면 여기서 추가 한다.
+
+		w.Write([]byte("template execute error. file: " + fname))
+		return
+	}
+}
+
